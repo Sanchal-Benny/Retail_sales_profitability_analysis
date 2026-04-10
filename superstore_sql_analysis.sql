@@ -1,7 +1,7 @@
 USE superstore;
 -- DATA UNDERSTANDING AND VALIDATION
 
---Checking the total number of rows in the dataset
+--Checking sum of rows in the dataset
 SELECT 
     COUNT(*) AS total_rows,
     COUNT(DISTINCT row_id) AS unique_row_ids
@@ -55,7 +55,7 @@ SELECT
 FROM superstore_full
 WHERE ship_date < order_date;
 
---Listing all unique category and sub-category combinations
+--Listing all unique category and sub category combinations
 SELECT DISTINCT
     category,
     sub_category
