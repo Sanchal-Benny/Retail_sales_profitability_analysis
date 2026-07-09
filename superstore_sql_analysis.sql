@@ -1,19 +1,15 @@
 USE superstore;
--- DATA UNDERSTANDING AND VALIDATION
 
---Checking sum of rows in the dataset
 SELECT 
     COUNT(*) AS total_rows,
     COUNT(DISTINCT row_id) AS unique_row_ids
 FROM superstore_full;
 
---Comparing total rows with distinct order IDs
 SELECT 
     COUNT(*) AS total_rows,
     COUNT(DISTINCT order_id) AS total_orders
 FROM superstore_full;
 
---Identifying sample orders with more than one line item
 SELECT 
     order_id,
     COUNT(*) AS line_count
@@ -23,7 +19,6 @@ HAVING COUNT(*) > 1
 ORDER BY line_count DESC
 LIMIT 10;
 
---checking for missing values in key columns
 SELECT
     SUM(CASE WHEN row_id IS NULL THEN 1 ELSE 0 END) AS null_row_id,
     SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) AS null_order_id,
@@ -36,8 +31,6 @@ SELECT
     SUM(CASE WHEN discount IS NULL THEN 1 ELSE 0 END) AS null_discount,
     SUM(CASE WHEN profit IS NULL THEN 1 ELSE 0 END) AS null_profit
 FROM superstore_full;
-
---reviewing min and max values of key numeric fields
 SELECT
     MIN(sales) AS min_sales,
     MAX(sales) AS max_sales,
@@ -48,21 +41,17 @@ SELECT
     MIN(profit) AS min_profit,
     MAX(profit) AS max_profit
 FROM superstore_full;
-
---checking for invalid ship dates
 SELECT 
     COUNT(*) AS invalid_ship_records
 FROM superstore_full
 WHERE ship_date < order_date;
 
---Listing all unique category and sub category combinations
 SELECT DISTINCT
     category,
     sub_category
 FROM superstore_full
 ORDER BY category, sub_category;
 
---KPI summary
 SELECT
     ROUND(SUM(sales), 2) AS total_sales,
     ROUND(SUM(profit), 2) AS total_profit,
@@ -72,8 +61,6 @@ SELECT
     ROUND(SUM(sales) / COUNT(DISTINCT order_id), 2) AS average_order_value,
     ROUND((SUM(profit) / SUM(sales)) * 100, 2) AS profit_margin_percent
 FROM superstore_full;
-
---Yearly sales and profit performance
 SELECT
     YEAR(order_date) AS order_year,
     ROUND(SUM(sales), 2) AS total_sales,
@@ -84,7 +71,6 @@ FROM superstore_full
 GROUP BY YEAR(order_date)
 ORDER BY order_year;
 
---Yearly sales and profit growth rates
 WITH yearly_performance AS (
     SELECT
         YEAR(order_date) AS order_year,
@@ -107,8 +93,6 @@ SELECT
     ) AS profit_growth_percent
 FROM yearly_performance
 ORDER BY order_year;
-
---Category level performance
 SELECT
     category,
     ROUND(SUM(sales), 2) AS total_sales,
@@ -119,8 +103,6 @@ SELECT
 FROM superstore_full
 GROUP BY category
 ORDER BY total_sales DESC;
-
---Sub-category performance
 SELECT
     category,
     sub_category,
@@ -133,7 +115,6 @@ FROM superstore_full
 GROUP BY category, sub_category
 ORDER BY total_sales DESC;
 
--- Top ten products by sales
 SELECT
     product_name,
     category,
@@ -147,7 +128,6 @@ GROUP BY product_name, category, sub_category
 ORDER BY total_sales DESC
 LIMIT 10;
 
--- Top ten products by profit
 SELECT
     product_name,
     category,
@@ -161,7 +141,6 @@ GROUP BY product_name, category, sub_category
 ORDER BY total_profit DESC
 LIMIT 10;
 
--- Worst ten products by profit
 SELECT
     product_name,
     category,
@@ -175,7 +154,6 @@ GROUP BY product_name, category, sub_category
 ORDER BY total_profit ASC
 LIMIT 10;
 
--- Top ten products profit concentration
 WITH product_performance AS (
     SELECT
         product_name,
@@ -196,9 +174,6 @@ SELECT
     ROUND((SUM(total_sales) / (SELECT SUM(sales) FROM superstore_full)) * 100, 2) AS top_10_sales_share_percent,
     ROUND((SUM(total_profit) / (SELECT SUM(profit) FROM superstore_full)) * 100, 2) AS top_10_profit_share_percent
 FROM top_10_products;
-
-
--- Top customers by sales
 SELECT
     customer_id,
     customer_name,
@@ -212,8 +187,6 @@ FROM superstore_full
 GROUP BY customer_id, customer_name, segment
 ORDER BY total_sales DESC
 LIMIT 10;
-
--- Top customers by profit
 SELECT
     customer_id,
     customer_name,
@@ -227,8 +200,6 @@ FROM superstore_full
 GROUP BY customer_id, customer_name, segment
 ORDER BY total_profit DESC
 LIMIT 10;
-
--- Top ten customers profit concentration
 WITH customer_performance AS (
     SELECT
         customer_id,
@@ -251,7 +222,6 @@ SELECT
     ROUND((SUM(total_profit) / (SELECT SUM(profit) FROM superstore_full)) * 100, 2) AS top_10_profit_share_percent
 FROM top_10_customers;
 
--- Customer segment performance
 SELECT
     segment,
     ROUND(SUM(sales), 2) AS total_sales,
@@ -264,9 +234,6 @@ SELECT
 FROM superstore_full
 GROUP BY segment
 ORDER BY total_sales DESC;
-
-
--- Regional performance
 SELECT
     region,
     ROUND(SUM(sales), 2) AS total_sales,
@@ -280,7 +247,6 @@ FROM superstore_full
 GROUP BY region
 ORDER BY total_sales DESC;
 
--- State level performance
 SELECT
     state,
     region,
@@ -292,7 +258,6 @@ FROM superstore_full
 GROUP BY state, region
 ORDER BY total_sales DESC;
 
--- Top states by profit
 SELECT
     state,
     region,
@@ -304,8 +269,6 @@ FROM superstore_full
 GROUP BY state, region
 ORDER BY total_profit DESC
 LIMIT 10;
-
--- Worst states by profit
 SELECT
     state,
     region,
@@ -318,8 +281,6 @@ GROUP BY state, region
 ORDER BY total_profit ASC
 LIMIT 10;
 
-
--- Performance by discount level
 SELECT
     discount,
     COUNT(*) AS transaction_lines,
@@ -330,7 +291,6 @@ FROM superstore_full
 GROUP BY discount
 ORDER BY discount;
 
--- Category performance across discount levels
 SELECT
     category,
     discount,
@@ -342,7 +302,6 @@ FROM superstore_full
 GROUP BY category, discount
 ORDER BY category, discount;
 
--- Sub category performance across discount levels
 SELECT
     category,
     sub_category,
@@ -355,7 +314,6 @@ FROM superstore_full
 GROUP BY category, sub_category, discount
 ORDER BY category, sub_category, discount;
 
--- Average discount and profitability by state
 SELECT
     state,
     region,
@@ -366,8 +324,6 @@ SELECT
 FROM superstore_full
 GROUP BY state, region
 ORDER BY total_profit ASC;
-
--- Weakest category and state combinations
 SELECT
     state,
     region,
@@ -381,8 +337,6 @@ HAVING SUM(profit) < 0
 ORDER BY total_profit ASC
 LIMIT 15;
 
-
--- Monthly sales and profit trends
 SELECT
     YEAR(order_date) AS order_year,
     MONTH(order_date) AS order_month,
@@ -394,7 +348,6 @@ FROM superstore_full
 GROUP BY YEAR(order_date), MONTH(order_date)
 ORDER BY order_year, order_month;
 
--- Best and worst performing months overall
 SELECT
     order_month,
     ROUND(AVG(monthly_sales), 2) AS avg_monthly_sales,
@@ -411,7 +364,6 @@ FROM (
 GROUP BY order_month
 ORDER BY avg_monthly_sales DESC;
 
--- Quarter wise performance
 SELECT
     YEAR(order_date) AS order_year,
     QUARTER(order_date) AS order_quarter,
@@ -422,7 +374,6 @@ SELECT
 FROM superstore_full
 GROUP BY YEAR(order_date), QUARTER(order_date)
 ORDER BY order_year, order_quarter;
-
 
 -- Repeat vs one time customers
 SELECT
@@ -439,7 +390,6 @@ FROM (
 GROUP BY order_frequency
 ORDER BY order_frequency;
 
--- Revenue from repeat vs one time buyers
 SELECT
     CASE 
         WHEN order_count = 1 THEN 'One Time Buyer'
@@ -460,8 +410,6 @@ FROM (
 ) AS customer_summary
 GROUP BY customer_type
 ORDER BY total_sales DESC;
-
--- Top repeat customers by number of orders
 SELECT
     customer_id,
     customer_name,
@@ -475,9 +423,6 @@ GROUP BY customer_id, customer_name, segment
 HAVING COUNT(DISTINCT order_id) > 1
 ORDER BY total_orders DESC
 LIMIT 10;
-
-
--- High risk products with high discount and negative profit
 SELECT
     product_name,
     category,
@@ -492,8 +437,6 @@ GROUP BY product_name, category, sub_category
 HAVING SUM(profit) < 0 AND AVG(discount) > 0.2
 ORDER BY total_profit ASC
 LIMIT 15;
-
--- Sub categories with highest return risk
 SELECT
     category,
     sub_category,
@@ -506,8 +449,6 @@ FROM superstore_full
 GROUP BY category, sub_category
 HAVING SUM(profit) < 0
 ORDER BY total_profit ASC;
-
--- States with highest concentration of return risk orders
 SELECT
     state,
     region,
@@ -521,3 +462,145 @@ WHERE discount > 0.2 AND profit < 0
 GROUP BY state, region, category
 ORDER BY total_profit ASC
 LIMIT 15;
+WITH product_category_performance AS (
+    SELECT
+        category,
+        product_name,
+        ROUND(SUM(sales), 2) AS total_sales,
+        ROUND(SUM(profit), 2) AS total_profit
+    FROM superstore_full
+    GROUP BY category, product_name
+),
+ranked_products AS (
+    SELECT
+        category,
+        product_name,
+        total_sales,
+        total_profit,
+        RANK() OVER (PARTITION BY category ORDER BY total_profit DESC) AS profit_rank
+    FROM product_category_performance
+)
+SELECT *
+FROM ranked_products
+WHERE profit_rank <= 3
+ORDER BY category, profit_rank;
+WITH customer_segment_performance AS (
+    SELECT
+        segment,
+        customer_id,
+        customer_name,
+        ROUND(SUM(sales), 2) AS total_sales,
+        ROUND(SUM(profit), 2) AS total_profit
+    FROM superstore_full
+    GROUP BY segment, customer_id, customer_name
+),
+ranked_customers AS (
+    SELECT
+        segment,
+        customer_id,
+        customer_name,
+        total_sales,
+        total_profit,
+        DENSE_RANK() OVER (PARTITION BY segment ORDER BY total_sales DESC) AS sales_rank
+    FROM customer_segment_performance
+)
+SELECT *
+FROM ranked_customers
+WHERE sales_rank <= 5
+ORDER BY segment, sales_rank;
+
+WITH monthly_sales AS (
+    SELECT
+        YEAR(order_date) AS order_year,
+        MONTH(order_date) AS order_month,
+        ROUND(SUM(sales), 2) AS monthly_total
+    FROM superstore_full
+    GROUP BY YEAR(order_date), MONTH(order_date)
+)
+SELECT
+    order_year,
+    order_month,
+    monthly_total,
+    ROUND(SUM(monthly_total) OVER (ORDER BY order_year, order_month), 2) AS running_total_sales
+FROM monthly_sales
+ORDER BY order_year, order_month;
+
+WITH monthly_sales AS (
+    SELECT
+        YEAR(order_date) AS order_year,
+        MONTH(order_date) AS order_month,
+        ROUND(SUM(sales), 2) AS monthly_total
+    FROM superstore_full
+    GROUP BY YEAR(order_date), MONTH(order_date)
+)
+SELECT
+    order_year,
+    order_month,
+    monthly_total,
+    LAG(monthly_total) OVER (ORDER BY order_year, order_month) AS prev_month_sales,
+    ROUND(
+        ((monthly_total - LAG(monthly_total) OVER (ORDER BY order_year, order_month))
+        / LAG(monthly_total) OVER (ORDER BY order_year, order_month)) * 100, 2
+    ) AS mom_growth_percent
+FROM monthly_sales
+ORDER BY order_year, order_month;
+WITH customer_ltv AS (
+    SELECT
+        customer_id,
+        customer_name,
+        segment,
+        ROUND(SUM(sales), 2) AS total_sales,
+        ROUND(SUM(profit), 2) AS total_profit
+    FROM superstore_full
+    GROUP BY customer_id, customer_name, segment
+)
+SELECT
+    customer_id,
+    customer_name,
+    segment,
+    total_sales,
+    total_profit,
+    NTILE(4) OVER (ORDER BY total_sales DESC) AS sales_quartile
+FROM customer_ltv
+ORDER BY total_sales DESC;
+
+WITH product_performance AS (
+    SELECT
+        category,
+        product_name,
+        ROUND(SUM(sales), 2) AS total_sales
+    FROM superstore_full
+    GROUP BY category, product_name
+)
+SELECT
+    category,
+    product_name,
+    total_sales,
+    ROUND(AVG(total_sales) OVER (PARTITION BY category), 2) AS category_avg_sales,
+    ROUND(total_sales - AVG(total_sales) OVER (PARTITION BY category), 2) AS diff_from_avg
+FROM product_performance
+ORDER BY category, diff_from_avg DESC;
+CREATE OR REPLACE VIEW vw_kpi_summary AS
+SELECT
+    ROUND(SUM(sales), 2) AS total_sales,
+    ROUND(SUM(profit), 2) AS total_profit,
+    SUM(quantity) AS total_quantity,
+    COUNT(DISTINCT order_id) AS total_orders,
+    COUNT(DISTINCT customer_id) AS total_customers,
+    ROUND(SUM(sales) / COUNT(DISTINCT order_id), 2) AS average_order_value,
+    ROUND((SUM(profit) / SUM(sales)) * 100, 2) AS profit_margin_percent
+FROM superstore_full;
+CREATE OR REPLACE VIEW vw_category_performance AS
+SELECT
+    category,
+    ROUND(SUM(sales), 2) AS total_sales,
+    ROUND(SUM(profit), 2) AS total_profit,
+    SUM(quantity) AS total_quantity,
+    COUNT(DISTINCT order_id) AS total_orders,
+    ROUND((SUM(profit) / SUM(sales)) * 100, 2) AS profit_margin_percent
+FROM superstore_full
+GROUP BY category;
+
+
+
+
